@@ -68,9 +68,30 @@ for filepath in filepaths:
         pdf.set_text_color(80, 80, 80)
 
         for column, width in col_widths.items():
-            value = str(row[column])  
-            pdf.cell(w=width, h=8, txt=value, border=1, align='L')
+            value = str(row[column])
+            align = 'R' if 'price' in column.lower() or 'amount' in column.lower() else 'L'
+            pdf.cell(w=width, h=8, txt=value, border=1, align=align)
         pdf.ln()  # Move to next row
-        
+
+    # Add total row
+    # Calculate total
+    total_sum = df['total_price'].sum() if 'total_price' in df.columns else df[df.columns[df.columns.str.contains('total', case=False)]].sum().iloc[0]
+    
+    # Add a small space before total
+    pdf.ln(5)
+    
+    # Draw total row with bold font and gray background
+    pdf.set_font("Arial", size=10, style='B')
+    pdf.set_fill_color(240, 240, 240)
+    
+    # Add empty cells for all columns except the last two
+    remaining_width = sum([width for col, width in col_widths.items() 
+                         if not (col == 'total_price' or 'total' in col.lower())])
+    pdf.cell(w=remaining_width, h=8, txt="Total:", border=1, align='R', fill=True)
+    
+    # Add total amount
+    pdf.cell(w=list(col_widths.values())[-1], h=8, 
+             txt=f"${total_sum:.2f}", border=1, align='R', fill=True)
+    pdf.ln()
 
     pdf.output(os.path.join(INVOICE_OUTPUT_DIR, f"{filename}.pdf"))
