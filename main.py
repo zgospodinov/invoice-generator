@@ -73,14 +73,13 @@ for filepath in filepaths:
             pdf.cell(w=width, h=8, txt=value, border=1, align=align)
         pdf.ln()  # Move to next row
 
-    # Add total row
     # Calculate total
     total_sum = df['total_price'].sum() if 'total_price' in df.columns else df[df.columns[df.columns.str.contains('total', case=False)]].sum().iloc[0]
     
-    # Add a small space before total
+    # Add a small space before total row
     pdf.ln(5)
     
-    # Draw total row with bold font and gray background
+    # Add total row with bold font and gray background
     pdf.set_font("Arial", size=10, style='B')
     pdf.set_fill_color(240, 240, 240)
     
@@ -94,4 +93,27 @@ for filepath in filepaths:
              txt=f"${total_sum:.2f}", border=1, align='R', fill=True)
     pdf.ln()
 
+    # Add space after table
+    pdf.ln(20)  # 20mm space
+
+    # Add total due section with larger font
+    pdf.set_font("Arial", size=16, style='B')
+    pdf.set_text_color(50, 50, 50)
+    pdf.cell(w=0, h=10, txt=f"Total Amount Due: ${total_sum:.2f}", ln=True, align='R')
+    
+    # Add space before company info
+    pdf.ln(15)
+
+    # Add company information
+    pdf.set_font("Arial", size=14, style='B')
+    pdf.set_text_color(100, 100, 100)
+    pdf.cell(w=0, h=10, txt="TechCorp Solutions Ltd.", ln=True, align='L')
+    pdf.image(os.path.join(SCRIPT_DIR, "pythonhow.png"), w=10, h=10)  # Adjust path and size as needed
+
+    # Add company slogan or additional info in italic
+    pdf.set_font("Arial", size=10, style='I')
+    pdf.set_text_color(150, 150, 150)
+    pdf.cell(w=0, h=8, txt="Innovating for tomorrow", ln=True, align='L')
+
+    # Save the PDF
     pdf.output(os.path.join(INVOICE_OUTPUT_DIR, f"{filename}.pdf"))
